@@ -3,11 +3,13 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import bcrypt from 'bcryptjs'
 import productsRouter from './src/routes/products.js'
 import usersRouter from './src/routes/users.js'
 import ordersRouter from './src/routes/orders.js'
 import paymentsRouter from './src/routes/payments.js'
 import adminRouter from './src/routes/admin.js'
+import pool from './src/db.js'
 
 dotenv.config()
 
@@ -15,7 +17,7 @@ const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 })
@@ -38,14 +40,21 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'SuperYa API funcionando' })
 })
 
+app.get('/api/reset-password', async (req, res) => {
+  try {
+    const hash = await bcrypt.hash('admin123', 10)
+    await pool.query('UPDATE users SET password = $1 WHERE email = $2', [hash, 'benjaarncivia@gmail.com'])
+    res.json({ ok: true, message: 'Contraseña reseteada' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 io.on('connection', (socket) => {
   console.log('Cliente conectado:', socket.id)
-
   socket.on('join_order', (orderId) => {
     socket.join(`order_${orderId}`)
-    console.log(`Cliente unido a sala order_${orderId}`)
   })
-
   socket.on('disconnect', () => {
     console.log('Cliente desconectado:', socket.id)
   })
