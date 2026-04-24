@@ -20,12 +20,13 @@ export const createPreference = async (req, res) => {
           currency_id: 'ARS',
         })),
         back_urls: {
-          success: 'http://localhost:5173/tracking?status=success',
-          failure: 'http://localhost:5173/cart?status=failure',
-          pending: 'http://localhost:5173/tracking?status=pending',
+          success: 'https://supermarket-frontend-8g59.onrender.com/tracking?status=success',
+          failure: 'https://supermarket-frontend-8g59.onrender.com/cart?status=failure',
+          pending: 'https://supermarket-frontend-8g59.onrender.com/tracking?status=pending',
         },
+        auto_return: 'approved',
         external_reference: String(order_id),
-        notification_url: 'http://localhost:3001/api/payments/webhook',
+        notification_url: 'https://supermarket-api-5fqe.onrender.com/api/payments/webhook',
       },
     })
 
